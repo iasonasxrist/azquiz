@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +28,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <nav
+          aria-label="Quizzes"
+          className="px-4 pt-6 max-w-xl mx-auto flex justify-center gap-6"
+        >
+          <Link href="/" className="text-blue-700 underline hover:text-blue-900">
+            AZ-204
+          </Link>
+          <Link href="/AZ305" className="text-blue-700 underline hover:text-blue-900">
+            AZ-305
+          </Link>
+        </nav>
         {children}
       </body>
     </html>

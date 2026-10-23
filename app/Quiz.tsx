@@ -7,7 +7,13 @@ interface Question {
   correct_answer: string[];
 }
 
-export default function Quiz({ questions }: { questions: Question[] }) {
+export default function Quiz({
+  questions,
+  title = "AZ-204 Quiz",
+}: {
+  questions: Question[];
+  title?: string;
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string[] }>(
     {}
@@ -15,8 +21,18 @@ export default function Quiz({ questions }: { questions: Question[] }) {
   const [showingAnswer, setShowingAnswer] = useState(false);
   const [inputIndex, setInputIndex] = useState("");
 
+  if (questions.length === 0) {
+    return (
+      <div className="px-4 py-6 max-w-xl mx-auto text-base sm:text-lg">
+        <h1 className="text-2xl font-bold text-center mb-6">{title}</h1>
+        <p className="text-center text-gray-700">No questions available yet.</p>
+      </div>
+    );
+  }
+
   const currentQuestion = questions[currentIndex];
   const isMultiple = currentQuestion.correct_answer.length > 1;
+  const hasChoices = currentQuestion.choices.length > 0;
 
   function toggleAnswer(letter: string) {
     setUserAnswers((prev) => {
@@ -49,7 +65,7 @@ export default function Quiz({ questions }: { questions: Question[] }) {
 
   return (
     <div className="px-4 py-6 max-w-xl mx-auto text-base sm:text-lg">
-      <h1 className="text-2xl font-bold text-center mb-6">AZ-204 Quiz</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">{title}</h1>
       <div className="mb-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
           <div className="text-gray-700">
@@ -86,7 +102,7 @@ export default function Quiz({ questions }: { questions: Question[] }) {
         {currentQuestion.choices.map((choice) => {
           const letter = Object.keys(choice)[0];
           const text = choice[letter];
-          const selected = userAnswers[currentIndex]?.includes(letter);
+          const selected = userAnswers[currentIndex]?.includes(letter) ?? false;
           return (
             <label key={letter} className="block">
               <div
@@ -117,18 +133,20 @@ export default function Quiz({ questions }: { questions: Question[] }) {
       {showingAnswer && (
         <div
           className={`mb-5 p-3 rounded ${
-            isCorrect()
+            !hasChoices
+              ? "bg-blue-50 text-gray-800"
+              : isCorrect()
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
         >
-          {isCorrect() ? (
+          {hasChoices && isCorrect() ? (
             "Correct!"
           ) : (
             <>
-              <div>Incorrect. Correct answer:</div>
+              <div>{hasChoices ? "Incorrect. Correct answer:" : "Correct answer:"}</div>
               <div
-                className="mt-2"
+                className="mt-2 prose max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: currentQuestion.correct_answer.join("<br/>"),
                 }}
